@@ -41,10 +41,10 @@ class EasyListPlasmoid(Applet):
 
     def init(self):
         print '~~~ init'
-        self.listname = "default"
-        self.username = self.conf().readEntry("username")
-        self.password = self.conf().readEntry("password")
-        self.serverurl = self.conf().readEntry("serverurl", "http://easylist.willemliu.nl/")
+        self.listname = str(self.config().readEntry("listname", "default").toString())
+        self.username = str(self.config().readEntry("username", "").toString())
+        self.password = str(self.config().readEntry("password", "").toString())
+        self.serverurl = str(self.config().readEntry("serverurl", "http://easylist.willemliu.nl/").toString())
         self.setPopupIcon('korg-todo')
         if not self.extender().hasItem('pyhello'):
             self.extenderItem = Plasma.ExtenderItem(self.extender())
@@ -62,6 +62,12 @@ class EasyListPlasmoid(Applet):
         layout.addWidget(urlLabel)
         layout.addWidget(self.urlEdit)
         urlLabel = QLabel(dialog)
+        urlLabel.setText("List name:")
+        self.listnameEdit = QLineEdit(dialog)
+        self.listnameEdit.setText(self.listname)
+        layout.addWidget(urlLabel)
+        layout.addWidget(self.listnameEdit)
+        urlLabel = QLabel(dialog)
         urlLabel.setText("Username:")
         self.usernameEdit = QLineEdit(dialog)
         self.usernameEdit.setText(self.username)
@@ -70,6 +76,7 @@ class EasyListPlasmoid(Applet):
         urlLabel = QLabel(dialog)
         urlLabel.setText("Password:")
         self.passwordEdit = QLineEdit(dialog)
+        self.passwordEdit.setEchoMode(QLineEdit.Password)
         self.passwordEdit.setText(self.password)
         layout.addWidget(urlLabel)
         layout.addWidget(self.passwordEdit)
@@ -80,13 +87,15 @@ class EasyListPlasmoid(Applet):
         dialog.exec_()
 
     def configChanged(self):
-        self.serverurl = self.urlEdit.text()
-        self.username = self.usernameEdit.text()
-        self.password = self.passwordEdit.text()
-        self.sync()
-        self.conf.writeEntry("username", self.username)
-        self.conf.writeEntry("password", self.password)
-        self.conf.writeEntry("serverurl", self.serverurl)
+        self.serverurl = str(self.urlEdit.text())
+        self.listname = str(self.listnameEdit.text())
+        self.username = str(self.usernameEdit.text())
+        self.password = str(self.passwordEdit.text())
+        self.config().sync()
+        self.config().writeEntry("username", self.username)
+        self.config().writeEntry("password", self.password)
+        self.config().writeEntry("serverurl", self.serverurl)
+        self.config().writeEntry("listname", self.listname)
 
     def initExtenderItem(self, item):
         print '~~~ initExtenderItem'
@@ -189,7 +198,9 @@ class EasyListPlasmoid(Applet):
 
     def doPull(self):
         payload = { 'username' : self.username, 'password' : self.password, 'name' : self.listname }
+        print payload
         r = requests.post(self.serverurl, data=payload)
+        print r.text
         self.listModel = r.text.split('<textarea id="list" rows="10" cols="50" name="list">')[1].split('</textarea>')[0].replace('\r', '')
         print self.listModel
         self.config().writeEntry(self.listname, self.listModel)
