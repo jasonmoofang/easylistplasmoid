@@ -1,25 +1,23 @@
-# -*- coding: utf-8 -*-
+#   -*- coding: utf-8 -*-
 #
-# Author: Lim Yuen Hoe <yuenhoe@hotmail.com>
-# Date: Wed Mar 20 2013, 19:40:05
+#   Copyright (C) 2009 Petri Damstén <damu@iki.fi>
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Library General Public License as
-# published by the Free Software Foundation; either version 2, or
-# (at your option) any later version.
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU Library General Public License as
+#   published by the Free Software Foundation; either version 2, or
+#   (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details
 #
-# You should have received a copy of the GNU Library General Public
-# License along with this program; if not, write to the
-# Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#   You should have received a copy of the GNU Library General Public
+#   License along with this program; if not, write to the
+#   Free Software Foundation, Inc.,
+#   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
-# Import essential modules
 import os, sys
 import requests
 from PyQt4.QtCore import *
@@ -30,63 +28,21 @@ from PyKDE4.plasmascript import Applet
 from PyKDE4.kdecore import *
 from PyKDE4.kdeui import *
 
-
-class EasyListPlasmoid(Applet):
-
-    #   Constructor, forward initialization to its superclass
-    #   Note: try to NOT modify this constructor; all the setup code
-    #   should be placed in the init method.
-    def __init__(self,parent,args=None):
-        Applet.__init__(self,parent)
+class Hello(Applet):
+    def __init__(self, parent, args = None):
+        Applet.__init__(self, parent)
+        self.frame = None
 
     def init(self):
         print '~~~ init'
         self.listname = "default"
-        self.username = self.conf().readEntry("username")
-        self.password = self.conf().readEntry("password")
-        self.serverurl = self.conf().readEntry("serverurl", "http://easylist.willemliu.nl/")
+        self.username = "moofang"
+        self.password = "Shirak"
+        self.serverurl = "http://easylist.willemliu.nl/"
         self.setPopupIcon('korg-todo')
         if not self.extender().hasItem('pyhello'):
             self.extenderItem = Plasma.ExtenderItem(self.extender())
             self.initExtenderItem(self.extenderItem)
-
-    def showConfigurationInterface(self):
-        dialog = KDialog()
-        dialog.resize(500,100)
-        dialog.setButtons(KDialog.ButtonCode(KDialog.Ok | KDialog.Cancel))
-        layout = QVBoxLayout()
-        urlLabel = QLabel(dialog)
-        urlLabel.setText("Sync server URL:")
-        self.urlEdit = QLineEdit(dialog)
-        self.urlEdit.setText(self.serverurl)
-        layout.addWidget(urlLabel)
-        layout.addWidget(self.urlEdit)
-        urlLabel = QLabel(dialog)
-        urlLabel.setText("Username:")
-        self.usernameEdit = QLineEdit(dialog)
-        self.usernameEdit.setText(self.username)
-        layout.addWidget(urlLabel)
-        layout.addWidget(self.usernameEdit)
-        urlLabel = QLabel(dialog)
-        urlLabel.setText("Password:")
-        self.passwordEdit = QLineEdit(dialog)
-        self.passwordEdit.setText(self.password)
-        layout.addWidget(urlLabel)
-        layout.addWidget(self.passwordEdit)
-        main = QWidget(dialog)
-        main.setLayout(layout)
-        dialog.setMainWidget(main)
-        QObject.connect(dialog, SIGNAL("okClicked()"), self.configChanged)
-        dialog.exec_()
-
-    def configChanged(self):
-        self.serverurl = self.urlEdit.text()
-        self.username = self.usernameEdit.text()
-        self.password = self.passwordEdit.text()
-        self.sync()
-        self.conf.writeEntry("username", self.username)
-        self.conf.writeEntry("password", self.password)
-        self.conf.writeEntry("serverurl", self.serverurl)
 
     def initExtenderItem(self, item):
         print '~~~ initExtenderItem'
@@ -196,7 +152,6 @@ class EasyListPlasmoid(Applet):
         self.config().sync()
         self.populateList()
 
-    #   CreateApplet method
-    #   Note: do NOT modify it, needed by Plasma
 def CreateApplet(parent):
-    return EasyListPlasmoid(parent)
+    return Hello(parent)
+
